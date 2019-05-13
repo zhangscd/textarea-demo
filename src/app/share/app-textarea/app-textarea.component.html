@@ -1,0 +1,19 @@
+<div class="textarea-editor-container" [ngStyle]="editorStyle" >
+    <div class="textarea-editor" contenteditable="true" #appTextArea></div>
+    <div class="resize-hanlder-bottom" #resizeBottom></div>
+    <div class="resize-hanlder-right" #resizeRight></div>
+    <div class="resize-hanlder-nwse" #resizeNwse></div>
+</div>
+
+<div class="suggest-list" [ngStyle]="suggestListStyle" *ngIf="suggestList.length > 0">
+    <div class="suggest-title">Please select a profile name or<br>press space key to close suggest list</div>
+    <ul>
+        <li *ngFor="let profile of suggestList">
+            <a (click)="selectProfile(profile.name)">{{profile.name}}</a>
+        </li>
+    </ul>
+</div>
+
+<span>Current Text:</span>
+<div>{{content$ | async}}</div>
+

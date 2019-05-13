@@ -1,0 +1,8 @@
+.store-container {
+    min-height: 150px;
+    overflow: auto;
+}
+
+.margin-top-20 {
+    margin-top: 20px;
+}
