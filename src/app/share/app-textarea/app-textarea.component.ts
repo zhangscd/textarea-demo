@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject, AfterViewInit, OnDestroy, ViewContainerRef, TemplateRef } from '@angular/core';
-import { DOCUMENT } from "@angular/common";
-import { BACKSPACE, DELETE, ENTER, V, X, TWO, UP_ARROW, DOWN_ARROW } from '@angular/cdk/keycodes';
+import { Component, OnInit, ViewChild, ElementRef, Inject, AfterViewInit, OnDestroy } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
+import { BACKSPACE, DELETE, ENTER, V, X, TWO } from '@angular/cdk/keycodes';
 import { Observable, fromEvent } from 'rxjs';
-import { tap, map, startWith, throttleTime, distinctUntilChanged, filter, mergeMap, takeUntil } from 'rxjs/operators';
+import {tap, map, startWith, distinctUntilChanged, filter, mergeMap, takeUntil} from 'rxjs/operators';
 
 import { AppEditorService, Profile } from './app-editor.service';
 
@@ -15,9 +15,9 @@ const LINE_HEIGHT = 20; // suggest list Y offset
 })
 export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
     // For Resize
-    @ViewChild('resizeBottom') resizeBottomRef: ElementRef;
-    @ViewChild('resizeRight') resizeRightRef: ElementRef;
-    @ViewChild('resizeNwse') resizeNwseRef: ElementRef;
+    @ViewChild('resizeBottom', { static: true }) resizeBottomRef: ElementRef;
+    @ViewChild('resizeRight', { static: true }) resizeRightRef: ElementRef;
+    @ViewChild('resizeNwse', { static: true }) resizeNwseRef: ElementRef;
     resizeBottomMouseDownEvent$: Observable<any>;
     resizeBottomMouseUpEvent$: Observable<any>;
     resizeBottomMouseMoveEvent$: Observable<any>;
@@ -46,7 +46,7 @@ export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
     selectionChangeEvent$: Observable<any>;
     keyEvent$: Observable<any>;
     keyEventAfterFilter$: Observable<any>;
-    @ViewChild('appTextArea') textAreaRef: ElementRef;
+    @ViewChild('appTextArea', { static: true }) textAreaRef: ElementRef;
     suggestList: Profile[] = [];
 
     private _currentRange: Range;
@@ -59,23 +59,23 @@ export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     constructor(private _editorService: AppEditorService,
-        @Inject(DOCUMENT) private _document: any) {
+                @Inject(DOCUMENT) private _document: any) {
     }
 
     ngOnInit() {
         // Initial Resize event Observable
         this.resizeBottomMouseDownEvent$ = fromEvent<MouseEvent>(this.resizeBottomRef.nativeElement, 'mousedown').
-            pipe(tap((event: MouseEvent) => { this._pageX = event.pageX; this._pageY = event.pageY; this._editorRect = this.textAreaRef.nativeElement.getBoundingClientRect() }));
+            pipe(tap((event: MouseEvent) => { this._pageX = event.pageX; this._pageY = event.pageY; this._editorRect = this.textAreaRef.nativeElement.getBoundingClientRect(); }));
         this.resizeBottomMouseUpEvent$ = fromEvent<MouseEvent>(this._document, 'mouseup');
         this.resizeBottomMouseMoveEvent$ = fromEvent<MouseEvent>(this._document, 'mousemove');
         this.resizeBottomEvent$ = this.resizeBottomMouseDownEvent$.pipe(mergeMap(down => this.resizeBottomMouseMoveEvent$.pipe(takeUntil(this.resizeBottomMouseUpEvent$))));
         this.resizeRightMouseDownEvent$ = fromEvent<MouseEvent>(this.resizeRightRef.nativeElement, 'mousedown').
-            pipe(tap((event: MouseEvent) => { this._pageX = event.pageX; this._pageY = event.pageY; this._editorRect = this.textAreaRef.nativeElement.getBoundingClientRect() }));
+            pipe(tap((event: MouseEvent) => { this._pageX = event.pageX; this._pageY = event.pageY; this._editorRect = this.textAreaRef.nativeElement.getBoundingClientRect(); }));
         this.resizeRightMouseUpEvent$ = fromEvent<MouseEvent>(this._document, 'mouseup');
         this.resizeRightMouseMoveEvent$ = fromEvent<MouseEvent>(this._document, 'mousemove');
         this.resizeRightEvent$ = this.resizeRightMouseDownEvent$.pipe(mergeMap(down => this.resizeRightMouseMoveEvent$.pipe(takeUntil(this.resizeRightMouseUpEvent$))));
         this.resizeNwseMouseDownEvent$ = fromEvent<MouseEvent>(this.resizeNwseRef.nativeElement, 'mousedown').
-            pipe(tap((event: MouseEvent) => { this._pageX = event.pageX; this._pageY = event.pageY; this._editorRect = this.textAreaRef.nativeElement.getBoundingClientRect(); console.log(event) }));
+            pipe(tap((event: MouseEvent) => { this._pageX = event.pageX; this._pageY = event.pageY; this._editorRect = this.textAreaRef.nativeElement.getBoundingClientRect(); console.log(event); }));
         this.resizeNwseMouseUpEvent$ = fromEvent<MouseEvent>(this._document, 'mouseup');
         this.resizeNwseMouseMoveEvent$ = fromEvent<MouseEvent>(this._document, 'mousemove');
         this.resizeNwseEvent$ = this.resizeNwseMouseDownEvent$.pipe(mergeMap(down => this.resizeNwseMouseMoveEvent$.pipe(takeUntil(this.resizeNwseMouseUpEvent$))));
@@ -92,12 +92,12 @@ export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
         this.selectionChangeEvent$ = fromEvent<KeyboardEvent>(this._document, 'selectionchange');
         this.keyEvent$ = fromEvent<KeyboardEvent>(this.textAreaRef.nativeElement, 'keydown');
         this.keyEventAfterFilter$ = this.keyEvent$.pipe(
-            filter(event => event.keyCode == BACKSPACE ||
-                event.keyCode == DELETE ||
-                event.keyCode == ENTER ||
-                (event.keyCode == V && event.ctrlKey && !event.shiftKey && !event.altKey) || // Ctrl + V
-                (event.keyCode == X && event.ctrlKey && !event.shiftKey && !event.altKey) || // Ctrl + X
-                event.keyCode == TWO && event.shiftKey // @
+            filter(event => event.keyCode === BACKSPACE ||
+                event.keyCode === DELETE ||
+                event.keyCode === ENTER ||
+                (event.keyCode === V && event.ctrlKey && !event.shiftKey && !event.altKey) || // Ctrl + V
+                (event.keyCode === X && event.ctrlKey && !event.shiftKey && !event.altKey) || // Ctrl + X
+                event.keyCode === TWO && event.shiftKey // @
             )
         );
     }
@@ -115,11 +115,6 @@ export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnDestroy() {
     }
 
-    /**
-     * Text Area resize event handler
-     * @param event
-     * @param resizeDirection
-     */
     private _resizeEditor(event: MouseEvent, resizeDirection: 'bottom' | 'right' | 'nwse') {
         let offsetX: number;
         let offsetY: number;
@@ -140,46 +135,37 @@ export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    /**
-     * Suggest list click event handler
-     * @param profileName
-     */
     selectProfile(profileName: string) {
         if (this._currentRange) {
-            let content = (this._currentRange.startContainer as any).data;
-            let offset = this._currentRange.endOffset;
-            let currentNameResult = this._editorService.getCurrentProfileName(content, offset);
-            
+            const content = (this._currentRange.startContainer as any).data;
+            const offset = this._currentRange.endOffset;
+            const currentNameResult = this._editorService.getCurrentProfileName(content, offset);
+
             if (currentNameResult.followAt) {
-                // trim the substring already inputed
-                let restLetters = profileName.substring(currentNameResult.name.length);
+                // trim the substring already inputted
+                const restLetters = profileName.substring(currentNameResult.name.length);
                 // insert select name
                 this._currentRange.insertNode(this._document.createTextNode(restLetters));
                 // set caret position
-                let selection = window.getSelection();
+                const selection = window.getSelection();
                 selection.removeAllRanges();
                 selection.addRange(this._currentRange);
             }
         }
         this._currentRange = null;
         this.suggestList = [];
-        //this.textAreaRef.nativeElement.focus();
     }
 
-    /**
-    * update caret information when selection change or function key(Backspace/Delete)
-    */
     private _updateCaretInfo(event: any) {
-        let activeElement = this._document.activeElement;
-        if (activeElement == this.textAreaRef.nativeElement) {
-            let selection = window.getSelection();            
+        const activeElement = this._document.activeElement;
+        if (activeElement === this.textAreaRef.nativeElement) {
+            const selection = window.getSelection();
 
-            if (selection.focusNode == this.textAreaRef.nativeElement) {
-                // when textare first time get focused, can't create range yet
-            }
-            else {
+            if (selection.focusNode === this.textAreaRef.nativeElement) {
+                // when textarea first time get focused, can't create range yet
+            } else {
                 if (selection.rangeCount && selection.isCollapsed) {
-                    let range = selection.getRangeAt(0);
+                    const range = selection.getRangeAt(0);
                     this.suggestList = this._editorService.getProfileList(selection.focusNode.textContent, range.endOffset);
                     this._currentRange = range;
                     console.log(range);
@@ -187,24 +173,21 @@ export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
             }
         }
     }
-    
-    /**
-    * handle BACKSPACE | DELETE | ENTER | Ctrl + V | Ctrl + X | @ Keydown event 
-    */
+
     private _onKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
             case DELETE:
             case BACKSPACE:
-                // these two fuction key won't trigger selectionchange event
-                // apply setTimeout to make sure excute this._updateCaretInfo() Range update after
+                // these two function key won't trigger selectionchange event
+                // apply setTimeout to make sure execute this._updateCaretInfo() Range update after
                 // content has been deleted
-                setTimeout(() => { this._updateCaretInfo(event)});
+                setTimeout(() => { this._updateCaretInfo(event); });
                 break;
             case ENTER:
                 break;
-            case V: //TODO Ctrl + V
+            case V: // TODO Ctrl + V
                 break;
-            case X: //TODO + X
+            case X: // TODO + X
                 break;
             case TWO: // @: open suggest list
                 this._openSuggestList();
@@ -215,16 +198,15 @@ export class AppTextareaComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private _openSuggestList() {
         if (window && window.getSelection) {
-            let selection = window.getSelection();
-            let focusNode = selection.focusNode;
+            const selection = window.getSelection();
+            const focusNode = selection.focusNode;
             let rect: ClientRect;
-            if (focusNode == this.textAreaRef.nativeElement) {
+            if (focusNode === this.textAreaRef.nativeElement) {
                 rect = (focusNode as HTMLElement).getBoundingClientRect();
                 this.suggestListStyle = { left: rect.left, top: rect.top + LINE_HEIGHT };
-            }
-            else {
+            } else {
                 if (selection.rangeCount) {
-                    let range = selection.getRangeAt(0).cloneRange();
+                    const range = selection.getRangeAt(0).cloneRange();
 
                     rect = range.getBoundingClientRect();
                     this.suggestListStyle = { left: rect.left, top: rect.bottom };

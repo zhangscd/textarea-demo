@@ -1,9 +1,9 @@
-import { Component, OnInit, Inject, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Inject, ViewChild, AfterViewInit } from '@angular/core';
 import { AppStore } from './share/app.store';
 import * as Redux from 'redux';
 import { Content } from './share/app-textarea/content.model';
 import * as ContentActions from './share/app-textarea/content.action';
-import { AppState, getAllContents, getCurrentContent } from './share/app.reducer';
+import { AppState, getAllContents } from './share/app.reducer';
 import { AppTextareaComponent } from './share/app-textarea/app-textarea.component';
 
 @Component({
@@ -12,7 +12,7 @@ import { AppTextareaComponent } from './share/app-textarea/app-textarea.componen
     styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
-    @ViewChild(AppTextareaComponent) textareaComponent: AppTextareaComponent; 
+    @ViewChild(AppTextareaComponent, { static: true }) textareaComponent: AppTextareaComponent;
     contents: Content[];
     private _currentContent: string;
 
@@ -31,7 +31,8 @@ export class AppComponent implements AfterViewInit {
     }
 
     onSave() {
-        if (this._currentContent)
+        if (this._currentContent) {
             this.store.dispatch(ContentActions.addContent({ id: this.contents.length++, text: this._currentContent }));
+        }
     }
 }
